@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
+import { createContext, useContext } from "react";
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -59,4 +61,36 @@ const Empty = styled.p`
   margin: 2.4rem;
 `;
 
+const TabelContext = createContext();
+function Table({columns, children }) {
+  return (
+    <TabelContext.Provider value={columns}>
+      <StyledTable role="tabel">{children}</StyledTable>
+    </TabelContext.Provider>
+  );
+}
+function Header({ children }) {
+  const columns = useContext(TabelContext);
+  return (
+      <StyledHeader columns={columns} role="row">
+        {children}
+      </StyledHeader>
+  );
+}
+function Row({ children }) {
+  const columns = useContext(TabelContext);
+  return <StyledRow role="row" columns={columns}>{children}</StyledRow>;
+}
+function Body({ data, render }) {
+  if (!data.length) return <Empty>No data to show at the moment</Empty>;
+  return <StyledBody>
+    {data.map(render)}
+  </StyledBody>;
+}
+Table.Header = Header;
+Table.Row = Row;
+Table.Body = Body;
+Table.Footer = Footer;
 
+
+export default Table;
